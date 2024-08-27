@@ -24,85 +24,79 @@ class EditLicense extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('payment')->label('Make Payment')
-            ->visible(fn (License $record) => $record->active != 1)
-->url(fn (License $record): string => route('checkout', $record->id))
-->openUrlInNewTab(),
-            \Filament\Tables\Actions\Action::make('payment')->label('Make Payment')
-                ->visible(fn (License $record) => $record->active != 1)
-                ->url(fn (License $record): string => route('checkout', $record->id))
-                ->openUrlInNewTab(),
-            Action::make('mpesa_payment')
-                ->form([
-                    TextInput::make('phone_number')->required(),
-                    TextInput::make('amount')->required()->default(function (License $license)
-                    {
-                        return $license->type->amount;
+            Actions\ActionGroup::make([
+                Action::make('payment')
+                    ->label('Make Payment')
+                    ->visible(fn () => $this->record && $this->record->active != 1)
+                    ->url(fn () => $this->record ? route('checkout', $this->record->id) : '#')
+                    ->openUrlInNewTab(),
+
+                Action::make('mpesa_payment')
+                    ->form([
+                        TextInput::make('phone_number')->required(),
+                        TextInput::make('amount')->required()->default(fn () => $this->record ? $this->record->type->amount : null),
+                    ])
+                    ->action(function (array $data) {
+                        (new MpesaService())->makeStkPayment($data);
                     }),
-                ])
-                ->action(function (array $data) {
-                    (new MpesaService())->makeStkPayment($data);
-                }),
-            Action::make('confirm_payment')
-                ->form([
-                    TextInput::make('phone_number')->required(),
-                    TextInput::make('amount')->required()->default(function (License $license)
-                    {
-                        return $license->type->amount;
-                    })->readOnly(fn (License $record) => $record->type->amount != null),
-                ])
-                ->action(function (array $data, License $license) {
-                    $transaction = MpesaTransaction::query()
-                        ->where('phone_number', $data['phone_number'])
-                        ->where('transaction_amount', $data['amount'])
-                        ->whereBetween('transaction_date', [Carbon::parse(now())->startOfDay(), Carbon::parse(now())->endOfMonth()])
-                        ->first();
-                    if ($transaction) {
-                        $user = auth()->user();
-                        $licenseType = LicenseType::where('id', $license->type->id)->first();
 
-                        if (!$licenseType) {
-                            session()->flash('failed', 'License type not found.');
-                        }
+                Action::make('confirm_payment')
+                    ->form([
+                        TextInput::make('phone_number')->required(),
+                        TextInput::make('amount')->required()->default(fn () => $this->record ? $this->record->type->amount : null)
+                            ->readOnly(fn () => $this->record && $this->record->type->amount !== null),
+                    ])
+                    ->action(function (array $data) {
+                        $transaction = MpesaTransaction::query()
+                            ->where('phone_number', $data['phone_number'])
+                            ->where('transaction_amount', $data['amount'])
+                            ->whereBetween('transaction_date', [Carbon::parse(now())->startOfDay(), Carbon::parse(now())->endOfMonth()])
+                            ->first();
 
-                        $licenseUser = License::where('user_id', $user->id)->where('id', $license->id)->first();
+                        if ($transaction && $this->record) {
+                            $user = auth()->user();
+                            $licenseType = $this->record->type;
 
-                        if ($licenseUser) {
-                            // Determine the expiry date based on the license duration
-                            $value = Core::licenceDuration($licenseType->duration);
-                            $licenseUser->update([
+                            if (!$licenseType) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('License Type Not Found')
+                                    ->body('The license type could not be found.')
+                                    ->send();
+
+                                return;
+                            }
+
+                            $this->record->update([
                                 'active' => 1,
-                                'expiry_date' => $value,
+                                'expiry_date' => Core::licenceDuration($licenseType->duration),
                             ]);
 
                             Payment::create([
                                 'user_id' => $user->id,
-                                'license_id' => $licenseUser->id,
+                                'license_id' => $this->record->id,
                                 'trx_ref' => Str::uuid(),
                                 'gateway' => 'Flutterwave',
                                 'amount' => $data['amount'],
                                 'info' => 'Payment Successful for ' . $licenseType->name . ' Activation/Renewal'
                             ]);
 
-                            $licenseUser->update([
-                                'type_id' => $licenseType->id,
-                            ]);
-                            //return the transaction
                             Notification::make()
                                 ->success()
-                                ->title(__('Transaction Confirmed'))
-                                ->body(__('Your transaction has been confirmed.'))
+                                ->title('Transaction Confirmed')
+                                ->body('Your transaction has been confirmed.')
                                 ->send();
                         } else {
                             Notification::make()
-                                ->success()
-                                ->title(__('Transaction Confirmation Failed'))
-                                ->body(__('Your transaction confirmation failed.'))
+                                ->danger()
+                                ->title('Transaction Confirmation Failed')
+                                ->body('Your transaction confirmation failed.')
                                 ->send();
                         }
-                    }
-                }),
-            Actions\DeleteAction::make(),
+                    }),
+
+                Actions\DeleteAction::make(),
+            ]),
         ];
     }
 }
