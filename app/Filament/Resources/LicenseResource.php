@@ -57,10 +57,10 @@ class LicenseResource extends Resource
                 })
                 ->searchable()
                     ->reactive()
-                    ->afterStateUpdated(function (Set $set, $state) {
-                        $licenseType=(string)$state;
+                    ->afterStateUpdated(function (callable $set, $state, $get) {
+                        $licenseName = LicenseType::find($state)?->duration; // Retrieve the name corresponding to the selected id
 
-                        $expiryDate = app(Core::class)->licenceDuration($state);
+                        $expiryDate = app(Core::class)->licenceDuration($licenseName);
                         $set('expiry_date', $expiryDate->format('Y-m-d'));
                     })
                 ->required(),
