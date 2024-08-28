@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9925e5905e0d26cd74e569a9ef9c30be",
+    "content-hash": "2850c06a94738916b1d6fa309e188cf1",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -7985,6 +7985,51 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.2.7"
             },
             "time": "2023-12-08T13:03:43+00:00"
+        },
+        {
+            "name": "venom/system-settings",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/VEN-LANG/system-settings-library.git",
+                "reference": "f988481e3894cd81774adce5c1c9e73dd2034fc6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/VEN-LANG/system-settings-library/zipball/f988481e3894cd81774adce5c1c9e73dd2034fc6",
+                "reference": "f988481e3894cd81774adce5c1c9e73dd2034fc6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/bus": "^11.21",
+                "illuminate/contracts": "^11.21",
+                "illuminate/database": "^11.21.0",
+                "illuminate/queue": "^11.21",
+                "illuminate/support": "^11.21.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Venom\\SystemSettings\\Providers\\SystemSettingsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Venom\\SystemSettings\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A laravel module that will handle system settings for your application.",
+            "support": {
+                "issues": "https://github.com/VEN-LANG/system-settings-library/issues",
+                "source": "https://github.com/VEN-LANG/system-settings-library/tree/v1.0.0"
+            },
+            "time": "2024-08-27T09:00:49+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
