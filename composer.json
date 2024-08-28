@@ -9,6 +9,11 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "bezhansalleh/filament-language-switch": "^3.1",
+        "codeat3/blade-clarity-icons": "^1.9",
+        "codeat3/blade-forkawesome": "^1.10",
+        "codeat3/blade-line-awesome-icons": "^1.4",
+        "codeat3/blade-pepicons": "^1.5",
         "filament/filament": "^3.2",
         "flowframe/laravel-trend": "^0.2.0",
         "iankumu/mpesa": "^1.3",
