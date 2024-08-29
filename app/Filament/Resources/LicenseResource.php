@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Libraries\Core\Filters\DateFilter;
 use App\Filament\Resources\LicenseResource\Pages;
 use App\Filament\Resources\LicenseResource\RelationManagers;
 use App\Libraries\Core;
@@ -98,6 +99,7 @@ class LicenseResource extends Resource
             ])
             ->filters([
                 //
+                DateFilter::fromTo()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
