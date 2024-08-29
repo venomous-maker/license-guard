@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Libraries\Core\Filters\DateFilter;
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Filament\Resources\PaymentResource\RelationManagers;
 use App\Models\Payment;
@@ -53,6 +54,7 @@ class PaymentResource extends Resource
             ])
             ->filters([
                 //
+                DateFilter::fromTo()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
