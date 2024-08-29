@@ -51,7 +51,7 @@ class UserResource extends Resource
                 TextColumn::make('name')->label('Name')->searchable()->sortable()->copyable(),
                 TextColumn::make('email')->copyable()->label('Email')
                 ->sortable()->searchable(),
-                TextColumn::make('created_at')->label('Registered at'),
+                TextColumn::make('created_at')->label('Registered at')->sortable()->searchable()->copyable(),
                 TextColumn::make('roles.name')
                     ->label('Roles')
                     ->sortable()
