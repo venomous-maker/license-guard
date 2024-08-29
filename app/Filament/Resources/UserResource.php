@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Libraries\Core\Filters\DateFilter;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 use Filament\Forms;
@@ -24,6 +25,8 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $recordTitleAttribute = 'title';
 
     public static function form(Form $form): Form
     {
@@ -45,8 +48,9 @@ class UserResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('avatar_url')->label('Profile Picture'),
-                TextColumn::make('name'),
-                TextColumn::make('email')->copyable(),
+                TextColumn::make('name')->label('Name')->searchable()->sortable()->copyable(),
+                TextColumn::make('email')->copyable()->label('Email')
+                ->sortable()->searchable(),
                 TextColumn::make('created_at')->label('Registered at'),
                 TextColumn::make('roles.name')
                     ->label('Roles')
