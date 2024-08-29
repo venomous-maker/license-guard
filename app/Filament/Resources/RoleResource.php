@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Libraries\Core\Filters\DateFilter;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Models\Permission;
 use App\Models\Role;
@@ -46,11 +47,11 @@ class RoleResource extends Resource
                 TextColumn::make('permissions.name')
                     ->label('Permissions')
                     ->sortable()
-                    ->searchable()
-                    ->limit(3),
+                    ->searchable(),
             ])
             ->filters([
                 //
+                DateFilter::fromTo()
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
